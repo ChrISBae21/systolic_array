@@ -43,7 +43,7 @@ initial begin
     A[2][0]=9;  A[2][1]=10; A[2][2]=11; A[2][3]=12;
     A[3][0]=13; A[3][1]=14; A[3][2]=15; A[3][3]=16;
 
-    // init B = Identity
+    // init B = Identity matrix
     for (i=0;i<4;i=i+1)
       for (j=0;j<4;j=j+1)
         B[i][j] = (i==j) ? 1 : 0;

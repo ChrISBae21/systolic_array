@@ -74,8 +74,6 @@ initial begin
     @(posedge clk);
     valid_in = 0;
 
-    // Wait one cycle
-    @(posedge clk);
 
     // Display result
     $display("Expected Sum = %d", expected);
@@ -85,6 +83,13 @@ initial begin
         $display("TEST PASSED");
     else
         $display("TEST FAILED");
+    // Wait one cycle
+//    @(posedge clk);
+
+    reset = 1;
+    expected = 0;
+    a_in = 0;
+    b_in = 0;
 
     $finish;
 
