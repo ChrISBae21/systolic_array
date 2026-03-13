@@ -27,7 +27,7 @@ generate
             wire [DATA_WIDTH-1:0] b_in;
             wire                  v_in;
 
-            // first PE
+            // first corner PE
             if ((i == 0) && (j == 0)) begin
                 assign a_in = a_in_row[0];
                 assign b_in = b_in_col[0];
