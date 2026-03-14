@@ -1,0 +1,1 @@
+To build the project in Vivado, run the tcl script build_project.tcl in Vivado/scripts/

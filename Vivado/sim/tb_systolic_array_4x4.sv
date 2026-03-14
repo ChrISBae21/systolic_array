@@ -14,7 +14,6 @@ wire valid_out;
 
 integer i,j,k,t;
 
-// DUT
 systolic_array_4x4 #(DATA_WIDTH) dut (
     .clk(clk),
     .reset(reset),
@@ -25,7 +24,7 @@ systolic_array_4x4 #(DATA_WIDTH) dut (
     .valid_out(valid_out)
 );
 
-// clock
+// create a fake clock
 always #5 clk = ~clk;
 
 // matrices
@@ -43,10 +42,10 @@ initial begin
     A[2][0]=9;  A[2][1]=10; A[2][2]=11; A[2][3]=12;
     A[3][0]=13; A[3][1]=14; A[3][2]=15; A[3][3]=16;
 
-    // init B = Identity matrix
-    for (i=0;i<4;i=i+1)
-      for (j=0;j<4;j=j+1)
-        B[i][j] = (i==j) ? 1 : 0;
+    B[0][0]=1;  B[0][1]=2;  B[0][2]=3;  B[0][3]=4;
+    B[1][0]=5;  B[1][1]=6;  B[1][2]=7;  B[1][3]=8;
+    B[2][0]=9;  B[2][1]=10; B[2][2]=11; B[2][3]=12;
+    B[3][0]=13; B[3][1]=14; B[3][2]=15; B[3][3]=16;
 
     // clear inputs
     for (i=0;i<4;i=i+1) begin
@@ -59,30 +58,23 @@ initial begin
     @(posedge clk);
     reset = 0;
 
-    // Run skewed injection for t = 0..9 (3N-3 for N=4)
+    // "Skew" timing for each element so that it's diagonal
     for (t = 0; t <= 9; t = t + 1) begin
-        // defaults each cycle
+        // reset inputs every cycle (inserting don't cares)
         for (i=0;i<4;i=i+1) begin
             a_in_row[i] = 0;
             b_in_col[i] = 0;
         end
         valid_in = 0;
 
-        // drive A: A[i][k] at time t = i + k
+        // at time t = i + k drive:
+        // A: A[i][k] (row)
+        // B: B[k][i] (col)
         for (i=0;i<4;i=i+1) begin
             for (k=0;k<4;k=k+1) begin
                 if (t == (i + k)) begin
                     a_in_row[i] = A[i][k];
-                    valid_in = 1;
-                end
-            end
-        end
-
-        // drive B: B[k][j] at time t = j + k
-        for (j=0;j<4;j=j+1) begin
-            for (k=0;k<4;k=k+1) begin
-                if (t == (j + k)) begin
-                    b_in_col[j] = B[k][j];
+                    b_in_col[i] = B[k][i];
                     valid_in = 1;
                 end
             end
@@ -98,8 +90,21 @@ initial begin
         b_in_col[i] = 0;
     end
 
-    // wait a couple cycles, then print
     repeat(2) @(posedge clk);
+
+    $display("Matrix A:");
+    for (i=0;i<4;i=i+1) begin
+        for (j=0;j<4;j=j+1)
+            $write("%0d ", A[i][j]);
+        $display("");
+    end
+    
+    $display("Matrix B:");
+    for (i=0;i<4;i=i+1) begin
+        for (j=0;j<4;j=j+1)
+            $write("%0d ", B[i][j]);
+        $display("");
+    end
 
     $display("Result Matrix C:");
     for (i=0;i<4;i=i+1) begin
